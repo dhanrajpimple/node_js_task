@@ -1,0 +1,112 @@
+openapi: 3.0.0
+info:
+  title: Event Booking System API
+  version: 1.0.0
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '201': { description: User registered successfully }
+        '400': { description: Bad request }
+  /api/auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200': { description: Successful login with JWT }
+        '401': { description: Invalid credentials }
+  /api/events:
+    post:
+      summary: Create an event
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                date: { type: string, format: date }
+                capacity: { type: integer }
+      responses:
+        '201': { description: Event created }
+        '401': { description: Unauthorized }
+    get:
+      summary: Get all events
+      parameters:
+        - name: start
+          in: query
+          schema: { type: string, format: date }
+        - name: end
+          in: query
+          schema: { type: string, format: date }
+        - name: page
+          in: query
+          schema: { type: integer }
+        - name: limit
+          in: query
+          schema: { type: integer }
+      responses:
+        '200': { description: List of events }
+  /api/events/{id}:
+    put:
+      summary: Update an event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                date: { type: string, format: date }
+                capacity: { type: integer }
+      responses:
+        '200': { description: Event updated }
+        '401': { description: Unauthorized }
+    delete:
+      summary: Delete an event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Event deleted }
+        '401': { description: Unauthorized }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
